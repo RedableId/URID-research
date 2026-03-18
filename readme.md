@@ -52,16 +52,22 @@
 
 ## Результаты
 
+Terms:
 * $D_b$ -- Best bits per symbol;
-* $D_a$ -- Average bits per symbol;
 * $D_w$ -- Worst bits per symbol;
 * $L_{vec}$ -- Vector length in bits;
-* $L_{id}$ -- Identifier length;
-* $L_{token}$ -- Token length ($L_{token} \leq L_{id}$);
-* $T$ -- Tokens count ($T \leq L_{id}$);
+* $L_{id}$ -- Identifier length in symbols;
+* $L_{token}$ -- Token length in symbols;
+* $C_{token}$ -- Tokens count;
 
-| Approach               | $D_b$ | $D_a$ | $D_w$ | Encode | Decode | Get | Replace | Insert | Remove | Comment |
-|:-----------------------|------:|------:|------:|:------:|:------:|:---:|:-------:|:------:|:------:|:-------:|
-| Enumeration            | 4.536 | 4.536 | 4.536 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | Requires reencode on any change |
-| Base32                 | 5.000 | 5.000 | 5.000 | $O(L_{id})$ | $O(L_{id})$ | $O(1)$ | $O(1)$ | $O(L_{id})$ | $O(L_{id})$ | Lose token's bounds |
-| Base64                 | 6.000 | 6.000 | 6.000 | $O(L_{id})$ | $O(L_{id})$ | $O(1)$ | $O(1)$ | $O(L_{id})$ | $O(L_{id})$ | Perfectly fits to 192-bits vector |
+Facts:
+* $L_{token} \leq L_{id}$ -- token can't be longer than whole identifier;
+* $C_{token} \leq L_{id}$ -- tokens count can't be more than identifier length;
+* $\overline{L_{token}} * C_{token} \leq L_{id}$ -- average token length and tokens count cannot be large both at the same time;
+
+| Approach               | $D_b$ | $D_w$ | Encode | Decode | Get | Replace | Insert/Remove | Comment |
+|:-----------------------|:-----:|:-----:|:------:|:------:|:---:|:-------:|:-------------:|:-------:|
+| Enumeration            | 4.536 | 4.536 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | Requires full reencoding on any change |
+| Base32                 | 5.000 | 5.000 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{token})$ | $O(L_{id})$ | $O(L_{id})$ | Loses token's bounds |
+| Base37                 | 5.333 | 5.333 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{token})$ | $O(L_{id})$ | $O(L_{id})$ | Magic-mul instead of bits-shift for division |
+| Base64                 | 6.000 | 6.000 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{token})$ | $O(L_{id})$ | $O(L_{id})$ | Perfectly fits to 192-bits vector |
