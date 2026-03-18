@@ -55,6 +55,7 @@
 * $D_b$ -- Best bits per symbol;
 * $D_a$ -- Average bits per symbol;
 * $D_w$ -- Worst bits per symbol;
+* $L_{vec}$ -- Vector length in bits;
 * $L_{id}$ -- Identifier length;
 * $L_{token}$ -- Token length ($L_{token} \leq L_{id}$);
 * $T$ -- Tokens count ($T \leq L_{id}$);
