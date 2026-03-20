@@ -68,7 +68,7 @@ Facts:
 | Approach               | $D_b$ | $D_w$ | Encode | Decode | Get | Replace | Insert/Remove | Comment |
 |:-----------------------|:-----:|:-----:|:------:|:------:|:---:|:-------:|:-------------:|:-------:|
 | Enumeration            | 4.536 | 4.536 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | Requires full reencoding on any change |
-| radix-token            | 4.832 | TODO  | $O(L_{id})$ | $O(L_{id})$ | $O(L_{token})$ | $O(L_{id})$ | $O(L_{id})$ | Capacity decreases with more tokens |
+| radix-token            | 4.832 | 9.142 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{token})$ | $O(L_{id})$ | $O(L_{id})$ | Capacity decreases with more tokens |
 | Base32                 | 5.000 | 5.000 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{token})$ | $O(L_{id})$ | $O(L_{id})$ | Loses token's bounds |
 | Base37                 | 5.333 | 5.333 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{token})$ | $O(L_{id})$ | $O(L_{id})$ | Magic-mul instead of bits-shift for division |
 | Base64                 | 6.000 | 6.000 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{token})$ | $O(L_{id})$ | $O(L_{id})$ | Perfectly fits to 192-bits vector |
