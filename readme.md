@@ -1,56 +1,78 @@
-# TLTR
+# URID - Universal Readable Identifier
 
 Задача данного проекта -- найти наиболее эффективную упаковку строки-идентификатора в 128-битный векторы (64, 192, 256 так же могут быть использованы, но 128 -- наиболее практичный размер сопоставимый с расходами на хранение пустой классической строки).
 
-Идентификатор -- это уникальное название сущности. Эти названия часто удобны при разработке и дебаге, но во время исполнения их строковое значение редко бывает полезно (конечно бывает, например для загрузки ресурса по имени или для создания калюча локализации).
+Идентификатор -- это уникальное название сущности. Эти названия часто удобны при разработке и дебаге, но во время исполнения их строковое значение редко бывает полезно (но, конечно бывает, например для загрузки ресурса по имени или для создания калюча локализации).
 
 Многие хотели бы не хранить эти строки в куче, не пересоздавать одинаковые строки и избежать других накладных расходов работы со строковымми данными.
 
 Этот проект поможет справиться вам с некоторыми перечисленными проблемами, если вы не против некоторых ограничений.
 
-# Детали
+# Details
 
-## Терминология
+## Terminology
 
-* __Буква__ -- символ из диапазона 'a' .. 'z';
-* __Цифра__ -- символ из диапазона '0' .. '9';
-* __Токен__ -- последовательность символов только букв или только цифр;
-* __Слово__ -- токен состоящий из букв;
-* __Число__ -- токен состоящий из цифр;
-* __Разделитель__ -- место в идентификаторе, означающее конец предыдущего токена и начало следующего (может быть отдельным символом или быть определенным по контексту).
-* __Идентификатор__ -- последовательность токенов;
-* __Путь__ -- последовательность идентификаторов.
-* __Вектор__ -- N-битное значение, содержащее идентификатор, где N может быть 64, 128, 192 или 256.
+* __Letter__ -- a character in the range 'a' .. 'z';
+* __Digit__ -- a character in the range '0' .. '9';
+* __Symbol__ -- Letter or Digit;
+* __Token__ -- a sequence of symbols that are either all letters or all digits;
+* __Word__ -- a token consisting of letters;
+* __Number__ -- a token consisting of digits;
+* __Separator__ -- a position in the identifier indicating the end of the previous token and the beginning of the next (can be a separate character or determined by context).
+* __Identifier__ -- a sequence of tokens;
+* __Path__ -- a sequence of identifiers.
+* __Vector__ -- an N-bit value describing an identifier, where N can be 64, 128, 192, or 256.
 
-## Язык
+## Language
 
-Используются символы английского алфавита и арабские цифры. Все другие символы считаются разделителями. Так же разделителем считается граница между буквами и цифрами без явного символа-разделителя (например `unit31` -- это два токена `unit` и `31`). В случае использования формата camelCase или PascalCase, граница определяется переходом от строчной к заглавной букве (например `unitBoss` -- это два токена `unit` и `Boss`).
+Identifiers use characters from the English alphabet and Arabic numerals. All other characters are considered separators.
 
-## Эффективность
+A separator is also considered to be the boundary between letters and digits without an explicit separator character (for example, `unit31` is two tokens `unit` and `31`). In the case of camelCase or PascalCase format, the boundary is determined by the transition from lowercase to uppercase letter (for example, `unitBoss` is two tokens `unit` and `Boss`).
 
-Под эффективностью понимается наиболее практичная реализация, позволяющая умещать в векторе наибольшее число символов, при этом позволяющая изменять вектор с наименьшими вычислительными затратами.
+## Identifier format
 
-## Требования
+Encoded vector value is format-agnostic. The user decides how to interpret the vector value as an identifier. We support case-based and separator-based formats. For example, for the same vector value we can have:
+* `greenBuyButton` -- camelCase format;
+* `GreenBuyButton` -- PascalCase format;
+* `green_buy_button` -- snake_case format;
+* `green-buy-button` -- kebab-case format;
+* etc...
 
-Длина идентификатора упакованного в фиксированный вектор в любом случае ограничена. Это ограничение может быть фиксировано или меняться в зависимости от количества токенов или чего-то еще. Наиболее практичным был бы подход при котором ограничение наиболее очевидно пользователю.
+## Efficiency
 
-Числа в идентификаторах -- спорный момент. Рассматриваются варианты:
-* `Default` -- Numbers are allowed anywhere in the identifier;
-* `EMN (end-multiple-numbers)` -- Multiple numbers are allowed, but only at the end of the identifier;
-* `ESN (end-single-number)` -- Only a single number is allowed at the end of the identifier;
+Efficiency is defined as the most practical implementation that allows to fit the largest number of symbols in a vector.
 
-Было бы очень удобно, если пустрая строка кодировалась в нулевой вектор.
+Also operations of full decoding and encoding are in priority. Fast random access to tokens and symbols is a nice-to-have, but not a must-have.
 
-## Операции
+## Requirements
 
-Операции, перечисленные в порядке приоритета минимизации их вычислительных затрат:
+### Identifier length
+The length of an identifier packed into a fixed vector is limited in any case. This limitation can be fixed or vary depending on the number of tokens or something else. The most practical approach would be one where the limitation is most obvious to the user.
 
-* `Encode` -- Упаковка строки в вектор
-* `Decode` -- Распаковка строки из вектора
-* `Get` -- Взятие токена по индексу
-* `Replace` -- Замена токена по индексу
-* `Insert` -- Вставка токена по индексу
-* `Remove` -- Удаление токена по индексу
+### Identifier expressiveness
+There is no right opinion about usage of numbers and separators in identifiers. Considering modes:
+* `Default` -- Any combination of letters, digits and separators is allowed (ex. `_button_x3_dark__`);
+* `ES` (explicit-separator) -- Separator is allowed only when there is no way to determine token boundaries by context (ex. `unit31`, but `unit_dog`, or `x64_86`);
+* `EMN` (ends-multiple-numbers) -- Multiple numbers are allowed, but only at the end of the identifier;
+* `ESN` (ends-single-number) -- Only a single number is allowed at the end of the identifier;
+
+### Vector values
+Zero vector must represent an empty identifier.
+
+Any value of vector must be decodable into a valid identifier.
+
+For any vector value $V$ is truth that $encode(decode(V)) = V$.
+
+## Operations
+
+Operations, listed in order of priority for minimizing their computational cost:
+
+* `Decode` -- Unpacking a string from a vector
+* `Encode` -- Packing a string into a vector
+* `Get` -- Getting a token by index
+* `Replace` -- Replacing a token by index
+* `Insert` -- Inserting a token by index
+* `Remove` -- Removing a token by index
 
 ## Results
 
