@@ -35,9 +35,9 @@
 Длина идентификатора упакованного в фиксированный вектор в любом случае ограничена. Это ограничение может быть фиксировано или меняться в зависимости от количества токенов или чего-то еще. Наиболее практичным был бы подход при котором ограничение наиболее очевидно пользователю.
 
 Числа в идентификаторах -- спорный момент. Рассматриваются варианты:
-* `Free` -- Числа разрешены в любом месте идентификатора;
-* `EndMulti` -- Числа могут встречаться только в конце идентификатора;
-* `EndSingle` -- Только одно число может встречаться в конце идентификатора;
+* `Default` -- Numbers are allowed anywhere in the identifier;
+* `EMN (end-multiple-numbers)` -- Multiple numbers are allowed, but only at the end of the identifier;
+* `ESN (end-single-number)` -- Only a single number is allowed at the end of the identifier;
 
 Было бы очень удобно, если пустрая строка кодировалась в нулевой вектор.
 
@@ -89,7 +89,7 @@ By following table we highlight only interesting cases of complexity.
 
 | Approach             | $D_b$ | $D_w$ | Complexity | Comment |
 |:---------------------|:-----:|:-----:|:----------:|:-------:|
-| Enumeration-EndMulti | 4.536 | 4.536 | Everything slow | Requires full reencoding on any change |
+| Enumeration-EMN      | 4.536 | 4.536 | Everything slow | Requires full re-encoding on any change |
 | radix-token          | 4.832 | 9.142 | Fast token operations | Capacity decreases with more tokens |
 | Base32               | 5.000 | 5.000 | Fast symbol operations | Loses token's bounds |
 | Base3-13-29          | 5.120 | 9.846 | Everything slow | Capacity decreases with more tokens |
