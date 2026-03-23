@@ -56,6 +56,7 @@
 
 ### Terms
 * $D_b$ -- Best bits per symbol;
+* $D_a$ -- Average bits per symbol;
 * $D_w$ -- Worst bits per symbol;
 * $L_{vec}$ -- Vector length in bits;
 * $L_{id}$ -- Identifier length in symbols;
@@ -87,12 +88,13 @@ By following table we highlight only interesting cases of complexity.
 
 ### Comparison table
 
-| Approach             | $D_b$ | $D_w$ | Complexity | Comment |
-|:---------------------|:-----:|:-----:|:----------:|:-------:|
-| Enumeration-EMN      | 4.536 | 4.536 | Everything slow | Requires full re-encoding on any change |
-| radix-token          | 4.832 | 9.142 | Fast token operations | Capacity decreases with more tokens |
-| Base32               | 5.000 | 5.000 | Fast symbol operations | Loses token's bounds |
-| Base3-13-29          | 5.120 | 9.846 | Everything slow | Capacity decreases with more tokens |
-| Base37               | 5.333 | 5.333 | Fast symbol operations | Magic-mul instead of bits-shift for division |
-| Base40               | 5.333 | 5.333 | Fast symbol operations | Same values can be encoded in different ways without strict rules |
-| Base64               | 6.000 | 6.000 | Fast symbol operations | Perfectly fits to 192-bits vector |
+| Approach             | $D_b$ | $D_a$ | $D_w$ | Complexity | Comment |
+|:---------------------|:-----:|:-----:|:-----:|:----------:|:-------:|
+| tANS (Tabled ANS)    | 3.434 | 4.492 | 9.542 | Fast encoding/decoding, slow random access | Ground-truth of coding entropy |
+| Enumeration-EMN      | 4.536 | 4.536 | 4.536 | Everything slow | Requires full re-encoding on any change |
+| radix-token          | 4.832 | ?.??? | 9.142 | Fast token operations | Capacity decreases with more tokens |
+| Base32               | 5.000 | 5.000 | 5.000 | Fast symbol operations | Loses token's bounds |
+| Base3-13-29          | 5.120 | ?.??? | 9.846 | Everything slow | Capacity decreases with more tokens |
+| Base37               | 5.333 | 5.333 | 5.333 | Fast symbol operations | Magic-mul instead of bits-shift for division |
+| Base40               | 5.333 | 5.333 | 5.333 | Fast symbol operations | Same values can be encoded in different ways without strict rules |
+| Base64               | 6.000 | 6.000 | 6.000 | Fast symbol operations | Perfectly fits to 192-bits vector |
