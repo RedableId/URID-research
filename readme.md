@@ -30,7 +30,7 @@
 
 Под эффективностью понимается наиболее практичная реализация, позволяющая умещать в векторе наибольшее число символов, при этом позволяющая изменять вектор с наименьшими вычислительными затратами.
 
-## Ограничения
+## Требования
 
 Длина идентификатора упакованного в фиксированный вектор в любом случае ограничена. Это ограничение может быть фиксировано или меняться в зависимости от количества токенов или чего-то еще. Наиболее практичным был бы подход при котором ограничение наиболее очевидно пользователю.
 
@@ -38,6 +38,8 @@
 * `Free` -- Числа разрешены в любом месте идентификатора;
 * `EndMulti` -- Числа могут встречаться только в конце идентификатора;
 * `EndSingle` -- Только одно число может встречаться в конце идентификатора;
+
+Было бы очень удобно, если пустрая строка кодировалась в нулевой вектор.
 
 ## Операции
 
@@ -50,9 +52,9 @@
 * `Insert` -- Вставка токена по индексу
 * `Remove` -- Удаление токена по индексу
 
-## Результаты
+## Results
 
-Terms:
+### Terms
 * $D_b$ -- Best bits per symbol;
 * $D_w$ -- Worst bits per symbol;
 * $L_{vec}$ -- Vector length in bits;
@@ -60,15 +62,37 @@ Terms:
 * $L_{token}$ -- Token length in symbols;
 * $C_{token}$ -- Tokens count;
 
-Facts:
+### Facts
 * $L_{token} \leq L_{id}$ -- token can't be longer than whole identifier;
 * $C_{token} \leq L_{id}$ -- tokens count can't be more than identifier length;
 * $\overline{L_{token}} * C_{token} \leq L_{id}$ -- average token length and tokens count cannot be large both at the same time;
 
-| Approach               | $D_b$ | $D_w$ | Encode | Decode | Get | Replace | Insert/Remove | Comment |
-|:-----------------------|:-----:|:-----:|:------:|:------:|:---:|:-------:|:-------------:|:-------:|
-| Enumeration            | 4.536 | 4.536 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | $O(L_{id})$ | Requires full reencoding on any change |
-| radix-token            | 4.832 | 9.142 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{token})$ | $O(L_{id})$ | $O(L_{id})$ | Capacity decreases with more tokens |
-| Base32                 | 5.000 | 5.000 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{token})$ | $O(L_{id})$ | $O(L_{id})$ | Loses token's bounds |
-| Base37                 | 5.333 | 5.333 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{token})$ | $O(L_{id})$ | $O(L_{id})$ | Magic-mul instead of bits-shift for division |
-| Base64                 | 6.000 | 6.000 | $O(L_{id})$ | $O(L_{id})$ | $O(L_{token})$ | $O(L_{id})$ | $O(L_{id})$ | Perfectly fits to 192-bits vector |
+### Complexity
+We interested in complexity of the following operations:
+- Identifier operations:
+    - Encode -- complexity of encoding of identifier of length $L_{id}$ into vector of length $L_{vec}$;
+    - Decode -- complexity of decoding of vector of length $L_{vec}$ into identifier of length $L_{id}$;
+    - GetLength -- complexity of getting identifier length in symbols;
+- Token operations:
+    - AppendSymbol -- complexity of adding a symbol to the end of identifier;
+    - AppendToken -- complexity of adding a token to the end of identifier;
+- Symbol operations:
+    - GetSymbol -- complexity of getting symbol by index;
+    - GetToken -- complexity of getting token by index;
+    - ReplaceSymbol -- complexity of replacing symbol by index;
+- Complexity of Insert/Remove of Symbol/Token by index is expected to be the same as for string buffer.
+
+Most complexity is $O(L_{id})$ -- that means in worst case we need decode (and re-encode sometimes) whole identifier.
+By following table we highlight only interesting cases of complexity.
+
+### Comparison table
+
+| Approach             | $D_b$ | $D_w$ | Complexity | Comment |
+|:---------------------|:-----:|:-----:|:----------:|:-------:|
+| Enumeration-EndMulti | 4.536 | 4.536 | Everything slow | Requires full reencoding on any change |
+| radix-token          | 4.832 | 9.142 | Fast token operations | Capacity decreases with more tokens |
+| Base32               | 5.000 | 5.000 | Fast symbol operations | Loses token's bounds |
+| Base3-13-29          | 5.120 | 9.846 | Everything slow | Capacity decreases with more tokens |
+| Base37               | 5.333 | 5.333 | Fast symbol operations | Magic-mul instead of bits-shift for division |
+| Base40               | 5.333 | 5.333 | Fast symbol operations | Same values can be encoded in different ways without strict rules |
+| Base64               | 6.000 | 6.000 | Fast symbol operations | Perfectly fits to 192-bits vector |
