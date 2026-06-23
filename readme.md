@@ -78,7 +78,7 @@ Operations, listed in order of priority for minimizing their computational cost:
 
 ### Terms
 * $D_b$ -- Best bits per symbol;
-* $D_a$ -- Average bits per symbol;
+* $D_a$ -- Average bits per symbol (assume 80% words 20% numbers);
 * $D_w$ -- Worst bits per symbol;
 * $L_{vec}$ -- Vector length in bits;
 * $L_{id}$ -- Identifier length in symbols;
@@ -114,9 +114,9 @@ By following table we highlight only interesting cases of complexity.
 |:---------------------|:-----:|:-----:|:-----:|:----------:|:-------:|
 | tANS (Tabled ANS)    | 3.434 | 4.492 | 9.542 | Fast encoding/decoding, slow random access | Ground-truth of coding entropy |
 | Enumeration-EMN      | 4.536 | 4.536 | 4.536 | Everything slow | Requires full re-encoding on any change |
-| radix-token          | 4.832 | ?.??? | 9.142 | Fast token operations | Capacity decreases with more tokens |
 | Base32               | 5.000 | 5.000 | 5.000 | Fast symbol operations | Loses token's bounds |
-| Base3-13-29          | 5.120 | ?.??? | 9.846 | Everything slow | Capacity decreases with more tokens |
 | Base37               | 5.333 | 5.333 | 5.333 | Fast symbol operations | Magic-mul instead of bits-shift for division |
 | Base40               | 5.333 | 5.333 | 5.333 | Fast symbol operations | Same values can be encoded in different ways without strict rules |
+| Base3-13-29          | 4.923 | 5.738 | 9.846 | Everything slow | Capacity decreases with more tokens |
+| radix-token          | 4.832 | 5.755 | 9.142 | Fast token operations | Capacity decreases with more tokens |
 | Base64               | 6.000 | 6.000 | 6.000 | Fast symbol operations | Perfectly fits to 192-bits vector |
